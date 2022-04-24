@@ -24,7 +24,8 @@ import com.sample.main.*;
 public class SelectionOperation {
 	// this function is used for the evaluation of the select statement
 	@SuppressWarnings("rawtypes")
-	public static Table selectionEvaluation(Statement statementObject, HashMap<String, Table> tableObjectsMap) throws IOException, ParseException, InterruptedException {
+	public static Table selectionEvaluation(Statement statementObject, HashMap<String, Table> tableObjectsMap)
+			throws IOException, ParseException, InterruptedException {
 
 		// this is the SelectBody object corresponding to the statement object
 		SelectBody selectBody = ((Select) statementObject).getSelectBody();
@@ -41,36 +42,34 @@ public class SelectionOperation {
 		// this is a list of table's that need to be joined
 		ArrayList<String> listOfTables = new ArrayList<String>();
 
-		if (((PlainSelect) selectBody) != null) {
+		if (((PlainSelect) selectBody) != null){
 			// this from item can contain a sub query, then evaluate the sub query
-			if (((PlainSelect) selectBody).getFromItem().toString().contains("SELECT ")
-					|| ((PlainSelect) selectBody).getFromItem().toString().contains("select ")) {
-
+			if(((PlainSelect) selectBody).getFromItem().toString().contains("SELECT ") || 
+			   ((PlainSelect) selectBody).getFromItem().toString().contains("select ")) {
+				
 				// this statement gets us the select body
 				FromItem fromItem = ((PlainSelect) selectBody).getFromItem();
 				// extract the select body out of the fromItem
-				SelectBody sBody = ((SubSelect) fromItem).getSelectBody();
+				SelectBody sBody = ((SubSelect)fromItem).getSelectBody();
 				// extract alias of the new table if any, this should be there in most cases
-				String alias = ((SubSelect) fromItem).getAlias().toString();
-				// now we make a select statement using the select body that we extracted, this
-				// is done because our selection function accepts a statement as a parameter
+				String alias = ((SubSelect)fromItem).getAlias();
+				// now we make a select statement using the select body that we extracted, this is done because our selection function accepts a statement as a parameter
 				Select selectStatement = new Select();
 				// set the body of the select statement
 				selectStatement.setSelectBody(sBody);
 				// get the table object evaluated through the sub query
-				Table subQueryTable = selectionEvaluation((Statement) selectStatement, tableObjectsMap);
-				// set the name of the new table obtained to be the alias that was extracted or
-				// if there is no alias then set the name as "subQueryTable"
-				if (alias == null) {
+				Table subQueryTable = selectionEvaluation((Statement)selectStatement, tableObjectsMap);
+				// set the name of the new table obtained to be the alias that was extracted or if there is no alias then set the name as "subQueryTable"
+				if(alias == null){
 					subQueryTable.tableName = "subQueryTable";
 					// put the table in the tableObjects map, so that we can refer it later
-					tableObjectsMap.put("subQueryTable", subQueryTable);
-				} else {
+					tableObjectsMap.put("subQueryTable", subQueryTable);	
+				} else{
 					subQueryTable.tableName = alias;
 					// put the table in the tableObjects map, so that we can refer it later
 					tableObjectsMap.put(alias, subQueryTable);
 				}
-
+				
 				// add the table name string to the list of tables to join
 				listOfTables.add(alias);
 			} else
@@ -128,6 +127,7 @@ public class SelectionOperation {
 
 		// now we scan the final list of tables to be joined and change their column
 		// description list and column index maps
+	
 		if (tablesToJoin.size() > 1) {
 			// iterate over the table objects and change their columnDescriptions and
 			// columnIndexMap
@@ -167,6 +167,7 @@ public class SelectionOperation {
 
 				// the following is the condition to skip selection in case of a sub-query in
 				// tpch-7 query
+				if(null != expression ) {
 				if (expression.toString().contains("n1.") && expression.toString().contains(" OR ")
 						&& expression.toString().contains("n2.")) {
 					tpch7SkipCondition = expression;
@@ -174,6 +175,7 @@ public class SelectionOperation {
 				}
 
 				expressionObjects.add(expression);
+				}
 			}
 
 			// this HashMap is used to form the AND expressions corresponding to a table

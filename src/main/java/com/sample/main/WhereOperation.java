@@ -45,7 +45,7 @@ public class WhereOperation {
 			return tableToApplySelectionOn;
 		
 		// this Table contains the resultant table, obtained after applying selection operation
-		File resultantTableFile = new File(tableToApplySelectionOn.tableDataDirectoryPath+System.getProperty("file.separator") + tableToApplySelectionOn.tableName + "|.tbl");
+		File resultantTableFile = new File(tableToApplySelectionOn.tableDataDirectoryPath+System.getProperty("file.separator") + tableToApplySelectionOn.tableName + ".tbl");
 		if(!resultantTableFile.exists())
 			resultantTableFile.createNewFile();
 		
@@ -1159,7 +1159,7 @@ public class WhereOperation {
 			throws IOException {
 
 		// now write to the .dat file describing the Where clause
-		FileWriter fwr = new FileWriter(resultantTable.tableFilePath, true);
+		FileWriter fwr = new FileWriter(resultantTable.tableFilePath, false);
 		BufferedWriter bwr = new BufferedWriter(fwr);
 
 		String tuple;

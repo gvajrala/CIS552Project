@@ -2,8 +2,10 @@ package com.sample.main;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -27,11 +29,14 @@ class Table {
 	File tableFilePath;
 	// this File object stores the directory in which the table is present
 	File tableDataDirectoryPath;
-	// this is the list of columnName and columnType pairs corresponding to the table
+	// this is the list of columnName and columnType pairs corresponding to the
+	// table
 	ArrayList<ColumnDefinition> columnDescriptionList;
-	// this HashMap stores the mappings from the columnNames to integer indices in the table
+	// this HashMap stores the mappings from the columnNames to integer indices in
+	// the table
 	HashMap<String, Integer> columnIndexMap;
-	// this ArrayList stores the tuples of the table in case the --swap flag is not present
+	// this ArrayList stores the tuples of the table in case the --swap flag is not
+	// present
 	ArrayList<String> tableTuples;
 	// this is the FileReader object for the table
 	FileReader fr;
@@ -66,10 +71,10 @@ class Table {
 
 	// this function is used to read the tuples of the table
 	public void readTable() throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(this.tableFilePath),32768);
+		BufferedReader br = new BufferedReader(new FileReader(this.tableFilePath), 32768);
 		String bufferString;
-		while ((bufferString = br.readLine()) != null){
-			if(bufferString.charAt(bufferString.length() - 1) == '|')
+		while ((bufferString = br.readLine()) != null) {
+			if (bufferString.charAt(bufferString.length() - 1) == '|')
 				bufferString = bufferString.substring(0, bufferString.length() - 1);
 			System.out.println(bufferString);
 		}
@@ -83,120 +88,138 @@ class Table {
 			this.columnIndexMap.put(cdPair.getColumnName(), indexCounter++);
 		}
 	}
-	
-	// this function is used to allocate the BufferedReader and the FileReader object for the .dat or .tbl file associated with the table
-	public void allocateBufferedReaderForTableFile() throws FileNotFoundException{
+
+	// this function is used to allocate the BufferedReader and the FileReader
+	// object for the .dat or .tbl file associated with the table
+	public void allocateBufferedReaderForTableFile() throws FileNotFoundException {
 		this.fr = new FileReader(this.tableFilePath);
-		this.br = new BufferedReader(fr,32768);
+		this.br = new BufferedReader(fr, 32768);
 	}
-	
-	// this function is used to return a tuple at a time from the .dat or .tbl file describing the table
-	public String returnTuple() throws IOException{
-		
-		// if both of these are null then allocate the reader object for the file corresponding to the table
-		if(this.br == null && this.fr == null)
+
+	// this function is used to return a tuple at a time from the .dat or .tbl file
+	// describing the table
+	public String returnTuple() throws IOException {
+
+		// if both of these are null then allocate the reader object for the file
+		// corresponding to the table
+		if (this.br == null && this.fr == null)
 			this.allocateBufferedReaderForTableFile();
-		
+
 		// this string is used to read a '|' delimited tuple of the .dat or .tbl file
 		String scanString = null;
 		// read the string using the BufferedReader
 		scanString = br.readLine();
-		// if the scanned string is a null object that means we have reached the end of file and we reallocate the buffered reader object for the table file
-		if(scanString == null){
+		// if the scanned string is a null object that means we have reached the end of
+		// file and we reallocate the buffered reader object for the table file
+		if (scanString == null) {
 			br.close();
 			br = null;
 			fr = null;
 		}
-		
+
 		return scanString;
 	}
-	
-	// this function is used to tell if a particular attribute or column is present in the Table's column description list or not
-	public boolean checkColumnNamePresentOrNot(String columnName){
-		
-		// iterate through the column definition list of the table and return true or false accordingly
-		for(ColumnDefinition cd : this.columnDescriptionList){
-			if(cd.getColumnName().equals(columnName))
+
+	// this function is used to tell if a particular attribute or column is present
+	// in the Table's column description list or not
+	public boolean checkColumnNamePresentOrNot(String columnName) {
+
+		// iterate through the column definition list of the table and return true or
+		// false accordingly
+		for (ColumnDefinition cd : this.columnDescriptionList) {
+			if (cd.getColumnName().equals(columnName))
 				return true;
 		}
-		
+
 		return false;
 	}
 }
 
 /* this is the Main class for the project */
 public class BatchMain {
-	
-	// this File object is the one that points to the data directory, this directory consists of all the .dat or the .tbl files in which our data is stored
+
+	// this File object is the one that points to the data directory, this directory
+	// consists of all the .dat or the .tbl files in which our data is stored
 	public static File dataDirectory = null;
 
-	// this File object is the one that points to the swap directory, this is the directory to which we can write during the course of our project execution
+	// this File object is the one that points to the swap directory, this is the
+	// directory to which we can write during the course of our project execution
 	public static File swapDirectory = null;
 
-	// this is the ArrayList that stores the File objects corresponding to all the .sql files supplied on input
-	public static ArrayList<File> sqlFileList = new ArrayList<File>();
+	// this is the ArrayList that stores the File objects corresponding to all the
+	// .sql files supplied on input
+	public static List<File> sqlFileList = new ArrayList<>();
 
-	// this HashMap stores the (table_name, table_file_path) pairs so that the look up for the tables becomes easy
+	// this HashMap stores the (table_name, table_file_path) pairs so that the look
+	// up for the tables becomes easy
 	public static HashMap<String, File> tablesNameAndFileMap = new HashMap<String, File>();
-	
+
 	@SuppressWarnings({ "unchecked", "unused" })
 	public static void main(String[] args) throws Exception {
 
 		// iterate over the args[] array and set the above variables
 		for (int i = 0; i < args.length; ++i) {
 
-			if (args[i].contains(".dat")) {
-				dataDirectory = new File(args[i]);
-			
-			} /*
-				 * else if (args[i].equals("--swap")) { swapDirectory = new File(args[i + 1]);
-				 * ++i; }
-				 */ else if(args[i].contains(".sql")) {
-				sqlFileList.add(new File(args[i]));
+			if (args[i].equals("--data")) {
+				dataDirectory = new File(args[i + 1]);
+				++i;
+			} else if (args[i].equals("--swap")) {
+				swapDirectory = new File(args[i + 1]);
+				++i;
+			} else {
+				sqlFileList =  Arrays.asList(new File(args[i]).listFiles());
 			}
 		}
 
-
-		// after setting all the variables populate the HashMap with (table_name, table_file_path) pairs
-	
+		System.out.println("SWAP : " + swapDirectory);
+		// after setting all the variables populate the HashMap with (table_name,
+		// table_file_path) pairs
+		for (File tableFile : dataDirectory.listFiles()) {
 			// this is the actual name of the file
-			String fileName = dataDirectory.getName().toLowerCase();
+			String fileName = tableFile.getName().toLowerCase();
 
 			if (fileName.endsWith(".tbl") || fileName.endsWith(".dat")) {
-				if (!tablesNameAndFileMap.containsKey(fileName.substring(0,fileName.lastIndexOf(".")))) {
-					tablesNameAndFileMap.put(fileName.substring(0, fileName.lastIndexOf(".")), dataDirectory);
+				if (!tablesNameAndFileMap.containsKey(fileName.substring(0, fileName.lastIndexOf(".")))) {
+					tablesNameAndFileMap.put(fileName.substring(0, fileName.lastIndexOf(".")), tableFile);
 				}
 			}
-		
+		}
 
 		// start scanning the .sql files provided in the input
 		for (File sqlFile : sqlFileList) {
 
 			// this is a FileReader object used in parsing the SQL file
-			
-			FileReader fr = new FileReader(sqlFile);
-		
-	       CCJSqlParser parser = new CCJSqlParser(fr);
 
-			// this HashMap stores the (table_name, table_TableObject) pairs, which is used to get the referenced Table object directly given a table's name
+			FileReader fr = new FileReader(sqlFile);
+
+			CCJSqlParser parser = new CCJSqlParser(fr);
+
+			// this HashMap stores the (table_name, table_TableObject) pairs, which is used
+			// to get the referenced Table object directly given a table's name
 			HashMap<String, Table> tableObjectsMap = new HashMap<String, Table>();
 
-			// this is the statement object returned by the CCJSqlParser when scanning the .sql file
-		
-			Statement statementObject ;
-				// check if the statement just scanned is an instance of the CreateTable statement
-			while ((statementObject = parser.Statement()) !=null) {
-				
+			// this is the statement object returned by the CCJSqlParser when scanning the
+			// .sql file
+
+			Statement statementObject;
+			// check if the statement just scanned is an instance of the CreateTable
+			// statement
+			while ((statementObject = parser.Statement()) != null) {
+
 				if (statementObject instanceof CreateTable) {
 
-					// make a new Table object corresponding to the CreateTable statement encountered
+					// make a new Table object corresponding to the CreateTable statement
+					// encountered
 					CreateTable ctStmt = (CreateTable) statementObject;
 
-					// this String object stores the name of the table, convert the name to LowerCase
+					// this String object stores the name of the table, convert the name to
+					// LowerCase
 					String tableName = ctStmt.getTable().getName().toLowerCase();
 
-					// this Table is a reference to the table that is present inside the create table statement
-					Table newTableObject = new Table(tableName, ctStmt.getColumnDefinitions().size(),tablesNameAndFileMap.get(tableName), dataDirectory);
+					// this Table is a reference to the table that is present inside the create
+					// table statement
+					Table newTableObject = new Table(tableName, ctStmt.getColumnDefinitions().size(),
+							tablesNameAndFileMap.get(tableName), dataDirectory);
 
 					// set the attributes of this new table object
 					newTableObject.columnDescriptionList = (ArrayList<ColumnDefinition>) ctStmt.getColumnDefinitions();
@@ -206,17 +229,23 @@ public class BatchMain {
 
 					// insert the pair of (table_name, table_TableObject) in the tableObjectsMap
 					tableObjectsMap.put(tableName, newTableObject);
-							
-				} else if (statementObject instanceof Select) {
-					// call the selection evaluation operator after encountering the select statement
-					Table resultTable = SelectionOperation.selectionEvaluation(statementObject, tableObjectsMap);
-					Limit limit = ((PlainSelect)(((Select) statementObject).getSelectBody())).getLimit();
-					
-					resultTable.readTable();
-				}
-				}
-		}
-			}
 
-	
+				} else if (statementObject instanceof Select) {
+					// call the selection evaluation operator after encountering the select
+					// statement
+					Table resultTable = SelectionOperation.selectionEvaluation(statementObject, tableObjectsMap);
+					Limit limit = ((PlainSelect) (((Select) statementObject).getSelectBody())).getLimit();
+
+					if(limit != null){
+						AggregateOperations.LimitOnTable(resultTable, (int)limit.getRowCount());
+					}
+					else{
+						resultTable.readTable();
+					}
+
+				}
+			}
+		}
+	}
+
 }
