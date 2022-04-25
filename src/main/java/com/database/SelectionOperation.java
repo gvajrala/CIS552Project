@@ -1,4 +1,4 @@
-package com.sample.main;
+package com.database;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+
+import com.database.*;
+
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.expression.Expression;
 
@@ -19,7 +22,6 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import com.sample.main.*;
 
 public class SelectionOperation {
 	// this function is used for the evaluation of the select statement
